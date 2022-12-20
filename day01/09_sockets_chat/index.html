@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>    
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet"
+    href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css">
+    <style>
+      #wishing-well {
+          position: relative;
+          width: 400px;
+          height: 300px;
+          margin: 50px;
+          outline: solid 1px black;
+      }
+      div.btn {
+          display: inline-block;
+          border: 2px solid #ccc;
+          margin-right: 5px;
+          padding: 2px 5px;
+          cursor: pointer;
+      }
+      div.btn.on {
+          background-color: #777;
+          color: white;
+      }
+    </style>
+    <title>html form</title>
+  </head>
+  <body>
+        <h1>TypeScript 03</h1>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+         <script type="module" src="dist/main.js"> </script>
+         <script type="module">
+            let webSocket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+            let el;
+            window.onload = function() {
+                let boxes = document.getElementsByClassName('btn');
+                for(let i = 0; i < boxes.length; i++) {
+                    let box = boxes[i];
+                    box.onclick = function(e) {
+                        const msg = e.target.innerHTML;
+                        let position = {x: Math.floor(Math.random() * 200), y: Math.floor(Math.random() * 150)};
+                        const data = {'type': 'message', 'message': msg, 'position': position};
+                        webSocket.send(JSON.stringify(data));
+                    }
+                }
+            }
+            function fade(element) {
+                var op = 1;  // initial opacity
+                var timer = setInterval(function () {
+                    if (op <= 0.1){
+                        clearInterval(timer);
+                        element.style.display = 'none';
+                    }
+                    element.style.opacity = op;
+                    element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                    op -= op * 0.1;
+                }, 100);
+            }
+            function unfade(element) {
+                var op = 0.1;  // initial opacity
+                element.style.display = 'block';
+                var timer = setInterval(function () {
+                    if (op >= 1){
+                        clearInterval(timer);
+                    }
+                    element.style.opacity = op;
+                    element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                    op += op * 0.1;
+                }, 100);
+            }
+            webSocket.onmessage = (event) => {
+              const data = JSON.parse(event.data);
+              if (data.type == 'time') {
+                el = document.getElementById('description');
+                el.innerHTML = 'Current time on server is: ' + event.data;
+              } else if (data.type == 'message') {
+                  // Grab the wishing-well
+                  const palette = document.getElementById('wishing-well');
+                  // create new div with position and innerHtml
+                  let msgContainer = document.createElement("div");
+                  msgContainer.id = "message"
+                  msgContainer.style.position = "absolute";
+                  console.log("position: ", data.position)
+                  msgContainer.style.top = data.position.y + "px";
+                  msgContainer.style.left = data.position.x + "px";
+                  msgContainer.style.opacity = 0;
+                  msgContainer.innerHTML = data.message;
+    
+                  // add the new div to wishing-well
+                  palette.appendChild(msgContainer);
+                  unfade(msgContainer)
+    
+                  // fire off fade/delete new div with a delay in the beginning
+                  async function fadeAndDelete() {
+                      setTimeout(() => {
+                          fade(msgContainer);
+                          setTimeout(() => {
+                              let elem = document.getElementById("message");
+                              elem.remove();
+                          }, 1100)
+                      }, 4000);
+                  }
+                  
+                  fadeAndDelete();
+                }
+            };
+            function sendMessage () {
+                const msg = document.getElementById("message_window").value;
+                console.log(msg)
+                let position = {x: Math.floor(Math.random() * 200), y: Math.floor(Math.random() * 150)};
+                const data = {'type': 'message', 'message': msg, 'position': position};
+                webSocket.send(JSON.stringify(data));
+            }
+            $("#display_button").on('click', sendMessage);
+        </script>
+        <div id="description"></div>  
+        <div class="subscribe-container">
+          <form>
+            <input type="text" id="message_window" minlength="2" maxlength="50" placeholder="Hi" required />
+            <input id="display_button" class="subscribe-button" type="button" value="Send">
+          </form>
+        </div>
+        <div id="wishing-well"></div>
+        <div class="button-row">
+          <div class="btn">Hello</div>
+          <div class="btn">What do you ponder?</div>    
+          <div class="btn">Thank you for your time</div>
+          <div class="btn">Be Mindful</div>
+          <div class="btn">Thank You</div>
+      </div>
+  </body>
+</html>
