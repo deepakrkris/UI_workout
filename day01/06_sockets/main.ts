@@ -1,4 +1,4 @@
-import 'https://code.jquery.com/jquery-3.6.0.min.js';
+/// <reference types="jquery" />
 
 interface Task {
     to_string(): string
@@ -15,6 +15,8 @@ function execute(task: Task) {
     $("#description").css({ 'color': 'red', 'font-size': '150%' });
 }
 
-export function setColor () {
+function setColor () {
     execute(task);
 }
+
+$("#display_button").on('click', setColor);
