@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>    
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet"
+    href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css">
+    <title>html form</title>
+  </head>
+  <body>
+        <h1>TypeScript 03</h1>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+         <script type="module" src="dist/main.js"> </script>
+         <script type="module">
+            let webSocket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+            let el;
+            var coin = 'U';
+            el = document.getElementById('description');
+
+            const allCells = document.querySelectorAll(".board__cell");
+            const cellHeight = allCells[0].offsetWidth;
+
+            allCells.forEach((cell) => {
+                cell.style.height = `${cellHeight}px`;
+            });
+
+            webSocket.onmessage = (event) => {
+              const data = JSON.parse(event.data);
+              console.log(data)
+              if (data.type == 'session') {
+                coin = data.coin;
+                el.innerHTML = 'Your coin is : ' + coin;
+              } if (data.type == 'message') {
+                const position = data.position;
+                const other_player_coin = data.coin;
+                document.querySelector(
+                    `[data-id='${position}']`
+                ).textContent = other_player_coin;
+              }
+            };
+            function boardEventListenerFunction ({target}) {
+                // console.log("I am clicking", target)
+                if (target.classList.contains("board__cell")) {
+                    const board_address = target.children[0].dataset.id;
+                    document.querySelector(
+                        `[data-id='${board_address}']`
+                    ).textContent = coin;
+                    // console.log("after set", target.children)
+                    const data = {'type': 'message', 'coin': coin, 'position': board_address};
+                    webSocket.send(JSON.stringify(data));
+                } else if (target.classList.contains("letter")) {
+                    const board_address = target.dataset.id;
+                    document.querySelector(
+                        `[data-id='${board_address}']`
+                    ).textContent = coin;
+                    const data = {'type': 'message', 'coin': coin, 'position': board_address};
+                    webSocket.send(JSON.stringify(data));
+                }
+            };
+            $(".board__container").on("click", boardEventListenerFunction);
+        </script>
+        <div class="row ">
+        <div class="col-md-9 board__main">
+            <div id="turn-notification-message" class="board___player-turn"></div>
+            <div id="description"></div>  
+            <div class="board__container">
+            <div class="board__cell">
+              <div class="letter" data-id="0"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="1"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="2"></div>
+            </div>
+    
+            <div class="board__cell">
+              <div class="letter" data-id="3"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="4"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="5"></div>
+            </div>
+    
+            <div class="board__cell">
+              <div class="letter" data-id="6"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="7"></div>
+            </div>
+            <div class="board__cell">
+              <div class="letter" data-id="8"></div>
+            </div>
+            </div>
+        </div>
+        </div>
+  </body>
+</html>
