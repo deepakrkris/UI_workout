@@ -28,5 +28,5 @@ export function isGameMessage(obj: any): obj is GameMessage {
 }
 
 export function isNotificationMessage(obj: any): obj is NotificationMessage {
-    return 'message' in obj && obj.type == 'result';
+    return 'message' in obj && (obj.type == 'result' || obj.type == 'take_turn');
 }

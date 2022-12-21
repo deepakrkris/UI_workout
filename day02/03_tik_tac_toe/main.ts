@@ -30,7 +30,12 @@ webSocket.onmessage = (event : MessageEvent) => {
           `[data-id='${position}']`
       ).textContent = other_player_coin;
   } else if (isNotificationMessage(data)) {
-      message_window.innerHTML = 'Result arrived : ' + data.message;
+      if (data.type == 'result')
+        message_window.innerHTML = 'Result arrived : ' + data.message;
+      else if (data.type == 'take_turn') {
+        message_window.innerHTML = data.message;
+        $(".board__container").on("click", gridListener);
+      }
   }
 };
 
@@ -38,8 +43,6 @@ function gridListener ({target}) {
     let board_address;
     if (target.classList.contains("board__cell")) {
         board_address = target.children[0].dataset.id;
-    } else if (target.classList.contains("letter")) {
-        board_address = target.dataset.id;
     }
 
     if (board_address) {
@@ -48,6 +51,8 @@ function gridListener ({target}) {
         ).textContent = coin;
         const data = {'type': 'message', 'coin': coin, 'position': board_address};
         webSocket.send(JSON.stringify(data));
+        message_window.innerHTML = "Wait! Other player's turn now";
+        $(".board__container").off("click", gridListener);
     }
 };
 

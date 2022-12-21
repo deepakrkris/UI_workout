@@ -86,8 +86,13 @@ ws_server.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
         coin_data[message.position] = message.coin;
 
         connections.forEach((session, id) => {
-            if (id != connectionid)
+            if (id != connectionid) {
                 session.client.send(JSON.stringify(message));
+                session.client.send(JSON.stringify({
+                    'type': 'take_turn',
+                    message: 'Your turn now !'
+                }));
+            }
         });
 
         if (isWinningMove(message.position, message.coin)) {
