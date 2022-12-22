@@ -1,13 +1,15 @@
-import { SessionMessage , GameMessage, isSessionObject, isGameMessage, NotificationMessage, isNotificationMessage, ClientSession } from './game_types.js';
-import { handleGameMessage, handleNotificationMessage, handleSessionMessage } from './ui_handlers.js';
+import { SessionMessage , GameMessage, isSessionObject, isGameMessage, NotificationMessage, isNotificationMessage, ClientState, isConnectionMessage } from '../models/game_types.js';
+import { handleGameMessage, handleNotificationMessage, handleSessionMessage, handleConnectionMessage } from './ui_handlers.js';
 
 class ClientConnectionHandler {
     static websocket: WebSocket;
-    static session : ClientSession;
+    static session : ClientState;
 }
 
-function messageHandler (data : SessionMessage | GameMessage | NotificationMessage, session : ClientSession) {
-    if (isSessionObject(data)) {
+function messageHandler (data : SessionMessage | GameMessage | NotificationMessage, session : ClientState) {
+    if (isConnectionMessage(data)) {
+        handleConnectionMessage(data, session);
+    } if (isSessionObject(data)) {
         handleSessionMessage(data, session)
     } else if (isGameMessage(data)) {
         handleGameMessage(data, session);

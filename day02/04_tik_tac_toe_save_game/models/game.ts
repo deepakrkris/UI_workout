@@ -1,9 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm"
+import { Entity, PrimaryColumn, Column, BaseEntity, UpdateDateColumn, CreateDateColumn } from "typeorm"
 
 @Entity()
 export class Game extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: string
+
+    @Column()
+    status: string
 
     @Column()
     user1: string
@@ -12,8 +15,20 @@ export class Game extends BaseEntity {
     user2: string
 
     @Column()
-    data: string
+    user1_coin: string
 
     @Column()
+    user2_coin: string
+
+    @Column()
+    data: string
+
+    @Column('varchar', {nullable: true})
     winner: string
+
+    @UpdateDateColumn()
+    updated_at: Date
+
+    @CreateDateColumn()
+    created_at: Date
 }

@@ -1,6 +1,6 @@
 import 'https://code.jquery.com/jquery-3.6.0.min.js';
 import { setup } from './client_connection.js';
-import { Game } from './game_types.js';
+import { GameState as Game } from '../models/game_types.js';
 
 const join_btn = document.getElementById('join_btn');
 
@@ -15,6 +15,7 @@ join_btn.addEventListener('click', function(event: MouseEvent) {
         detail : {
             user1,
             user2,
+            status: 'new',
         },
     };
     var game_event = new CustomEvent("setup_server_connection", game);

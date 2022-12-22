@@ -1,5 +1,5 @@
 import 'https://code.jquery.com/jquery-3.6.0.min.js';
-import { SessionMessage , GameMessage, NotificationMessage, ClientSession } from './game_types.js';
+import { SessionMessage , GameMessage, NotificationMessage, ClientState, ConnectionMessage } from '../models/game_types.js';
 
 const message_window = document.getElementById('description');
 
@@ -9,17 +9,22 @@ function coin_selector(value : string) {
     return coin_class;
 }
 
-export function handleGridAction(session : ClientSession, board_address) {
+export function handleGridAction(session : ClientState, board_address) {
     document.querySelector(
         `[data-id='${board_address}']`
     ).innerHTML = `<div class=\"${coin_selector(session.coin)}\"></div>`;
-    const data = {'type': 'message', 'coin': session.coin, 'position': board_address};
+    const data : GameMessage = {
+        'type': 'message',
+        'coin': session.coin,
+        'position': board_address,
+        'gameId': session.gameId,
+    };
     session.client.send(JSON.stringify(data));
     message_window.innerHTML = "Wait! Other player's turn now";
     $(".board__container").off("click");
 }
 
-function setupGridListener(session : ClientSession) {
+function setupGridListener(session : ClientState) {
     return function gridListener({target}) {
         let board_address;
         if (target.classList.contains("board__cell")) {
@@ -31,20 +36,31 @@ function setupGridListener(session : ClientSession) {
     };
 }
 
-export function handleSessionMessage(data : SessionMessage, session : ClientSession) {
-    session.coin = data.coin;
-    session.gridListener = setupGridListener(session); 
-    console.log("handleSessionMessage", data)
+export function handleConnectionMessage(messg : ConnectionMessage, session : ClientState) {
+    const data : SessionMessage = {
+        'type': 'session_begin',
+        'user1': session.user1,
+        'user2': session.user2,
+        'connectionid': messg.connectionid,
+    };
+    session.client.send(JSON.stringify(data));
+}
+
+export function handleSessionMessage(message : SessionMessage, session : ClientState) {
+    session.gameId = message.gameId;
+    session.coin = message.coin;
+    session.gridListener = setupGridListener(session);
+    console.log("handleSessionMessage", message, session);
     message_window.innerHTML = ' ' + `<div class=\"${coin_selector(session.coin)}\">Your coin is :</div>`;
-    data.grid.forEach((value, pos) => {
-    document.querySelector(
+    message.grid.forEach((value, pos) => {
+        document.querySelector(
           `[data-id='${pos}']`
         ).innerHTML = `<div class=\"${coin_selector(value)}\"></div>`;
     });
     $(".board__container").on("click", session.gridListener);
 }
 
-export function handleGameMessage(data : GameMessage, session : ClientSession) {
+export function handleGameMessage(data : GameMessage, session : ClientState) {
     console.log("handleGameMessage", data, session)
     const position = data.position;
     const other_player_coin = data.coin;
@@ -53,7 +69,7 @@ export function handleGameMessage(data : GameMessage, session : ClientSession) {
     ).innerHTML = `<div class=\"${coin_selector(other_player_coin)}\"></div>` ;
 }
 
-export function handleNotificationMessage(data : NotificationMessage, session : ClientSession) {
+export function handleNotificationMessage(data : NotificationMessage, session : ClientState) {
     console.log("handleNotificationMessage", data, session)
     if (data.type == 'result')
         message_window.innerHTML = 'Result arrived : ' + data.message;

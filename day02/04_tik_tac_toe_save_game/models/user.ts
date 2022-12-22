@@ -3,14 +3,11 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm"
 @Entity()
 export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id: string
+    username: string
 
     @Column()
-    firstName: string
+    numberOfGames: number
 
     @Column()
-    lastName: string
-
-    @Column()
-    score: string
+    wins: number
 }

@@ -20,9 +20,11 @@
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.4",
     "typeorm": "^0.3.11",
+    "uuid": "^9.0.0",
     "ws": "^8.11.0"
   },
   "devDependencies": {
-    "@types/jquery": "^3.5.14"
+    "@types/jquery": "^3.5.14",
+    "@types/uuid": "^9.0.0"
   }
 }
