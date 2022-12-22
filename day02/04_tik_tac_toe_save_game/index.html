@@ -17,12 +17,12 @@
             <input type="text" minlength="5" maxlength="8" id="user1" placeholder="Your UserId" required>
             <input type="text" minlength="5" maxlength="8" id="name" placeholder="Your Name" required><br>
             <input type="text" minlength="5" maxlength="8" id="user2" placeholder="Friends userId" required>
-            <button id="join_btn" class="subscribe-button">Join a game!!</button>
+            <button type='button' id="join_btn" class="subscribe-button">Join a game!!</button>
+            <div id="description" class="description"></div> 
           </form>
-        </div>
+        </div> 
         <div class="row ">
             <div class="col-md-9 board__main">
-                <div id="description" class="description"></div>  
                 <div class="board__container">
                     <div class="board__cell">
                       <div class="letter" data-id="0"></div>
@@ -56,22 +56,5 @@
                 </div>
             </div>
         </div>
-        <script>
-          $(document).ready(function() {
-              $('#join_btn').attr('disabled', true);
-              const fields = ['#user1', '#user2', '#name'];
-              fields.forEach((field) => {
-                  $(field).keyup(function(event) {
-                      const all_fields_entered = fields.every((f) => {
-                        return $(f).val() != '' && $(f).val().length >= parseInt($(f).attr('minlength'))
-                      });
-                      if (all_fields_entered)
-                          $('#join_btn').attr('disabled', false);
-                      else
-                          $('#join_btn').attr('disabled', true);  
-                  });
-              });
-          });
-        </script>
   </body>
 </html>

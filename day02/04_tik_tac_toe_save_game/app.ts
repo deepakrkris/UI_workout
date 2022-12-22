@@ -4,7 +4,7 @@ import path from 'path';
 import { WebSocketServer as Server } from 'ws';
 import * as http from 'http'
 import { ClientSession , GameMessage, NotificationMessage } from './game_types';
-import { init } from './connection.js';
+import { init } from './db_connection.js';
 import { Game, User } from './models';
 
 const __dirname = path.resolve();

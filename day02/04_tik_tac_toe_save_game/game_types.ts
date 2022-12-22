@@ -1,6 +1,9 @@
 export interface ClientSession {
     client : WebSocket,
-    coin : string,
+    coin? : string,
+    gridListener? : (e: any) => void,
+    user1? : string,
+    user2? : string,
 };
 
 export interface GameMessage {
@@ -20,10 +23,10 @@ export interface SessionMessage {
 };
 
 export interface Game {
-    id : string,
+    id? : string,
     user1 : string,
     user2 : string,
-    grid : string,
+    grid? : string,
 };
 
 export function isSessionObject(obj: any): obj is SessionMessage {
