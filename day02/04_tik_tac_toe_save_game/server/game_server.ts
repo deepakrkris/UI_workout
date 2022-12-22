@@ -2,7 +2,7 @@ import { WebSocketServer as Server } from 'ws';
 import * as http from 'http'
 import { ClientState , GameMessage, NotificationMessage, GameState, isSessionObject, isGameMessage, SessionMessage } from '../models/game_types.js';
 import { isWinningMove } from './board_handlers.js';
-import { createOrGetGameSession, saveGameMove } from './repository.js';
+import { createOrGetGameSession, saveGameMove, saveGameResult } from './repository.js';
 
 interface ExtendedWebSocket extends WebSocket {
     connectionid : string,
@@ -19,8 +19,6 @@ async function establishSession(game : GameState, status : string, connectionid 
     saved_game.connections = saved_game.connections || [];
     saved_game.connections.push(connectionid);
 
-    console.log('saved_game', saved_game);
-
     GameServer.connections.get(connectionid).client.send(JSON.stringify({
         'type': 'session_created',
         'coin' : status == 'new' ? saved_game.user1_coin : saved_game.user2_coin,
@@ -29,9 +27,12 @@ async function establishSession(game : GameState, status : string, connectionid 
     }));
 }
 
-async function handleGameEnd(message : GameMessage, game : GameState, current_user_connection_id : string) {
-    if (isWinningMove(game, message.position, message.coin)) {
+async function handleGameEnd(client_message : GameMessage, game : GameState, current_user_connection_id : string) {
+    if (isWinningMove(game, client_message.position, client_message.coin)) {
         const message = "You Won !!!"; 
+
+        await saveGameResult(client_message);
+
         GameServer.connections.forEach((session, id) => {
             if (id == current_user_connection_id) {
                 const result_data : NotificationMessage = {
@@ -64,7 +65,6 @@ async function publishGameMoves(message : GameMessage, game : GameState, current
 }
 
 export async function messageHandler (data : SessionMessage | GameMessage | NotificationMessage, connectionid : string) {
-    console.log("message received ", data);
     if (isSessionObject(data)) {
         const game : GameState = await createOrGetGameSession(data);
         if (!GameServer.games.get(game.id)) {
@@ -76,9 +76,7 @@ export async function messageHandler (data : SessionMessage | GameMessage | Noti
         }
         await establishSession(GameServer.games.get(game.id), game.status, connectionid);
     } else if (isGameMessage(data)) {
-        console.log("g message received ", data);
         const game : GameState = GameServer.games.get(data.gameId);
-        console.log("game.coin_data ", game.coin_data);
         game.coin_data[data.position] = data.coin;
         await saveGameMove(data, game);
         await publishGameMoves(data, game, connectionid);
@@ -95,21 +93,17 @@ function server_message_handler (event: MessageEvent<any>) {
 function new_connection_handler(ws: ExtendedWebSocket, req: http.IncomingMessage) {
     const connectionid = req.headers['sec-websocket-key'];
  
-    console.log("new connection ", connectionid);
-
     ws.connectionid = connectionid;
 
     GameServer.connections.set(connectionid, {
         client : ws,
     });
-
     GameServer.connections.get(connectionid).client.send(JSON.stringify({
         'type': 'connection_created',
         connectionid,
     }));
 
     ws.addEventListener('message', server_message_handler.bind(ws));
-
     ws.addEventListener('close', (ev: CloseEvent) => {
         GameServer.connections.delete(connectionid);
         console.log('Client has disconnected!');

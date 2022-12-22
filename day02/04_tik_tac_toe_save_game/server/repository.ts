@@ -9,10 +9,10 @@ export async function createOrGetGameSession(data : SessionMessage) : Promise<Ga
     const queryRunner = getQueryRunner();
 
     await queryRunner.connect();
-    let games : Game[] = await queryRunner.query((`select * from game where user1 = \'${user1}\' and user2 = \'${user2}\' ORDER BY updated_at DESC Limit 1`));
+    let games : Game[] = await queryRunner.query((`select * from game where user1 = \'${user1}\' and user2 = \'${user2}\' and status != 'completed' ORDER BY updated_at DESC Limit 1`));
 
     if (!games || !games.length) {
-        games = await queryRunner.query((`select * from game where user1 = \'${user2}\' and user2 = \'${user1}\' ORDER BY updated_at DESC Limit 1`));
+        games = await queryRunner.query((`select * from game where user1 = \'${user2}\' and user2 = \'${user1}\' and status != 'completed' ORDER BY updated_at DESC Limit 1`));
     }
 
     if (games && games.length) {
@@ -57,5 +57,14 @@ export async function saveGameMove(message : GameMessage, data : GameState) : Pr
     const new_game : Game = new Game();
     new_game.id = gameId;
     new_game.data = JSON.stringify(data.coin_data);
+    await new_game.save();
+}
+
+export async function saveGameResult(message : GameMessage) : Promise<void> {
+    const gameId = message.gameId;
+    const new_game : Game = new Game();
+    new_game.id = gameId;
+    new_game.status = 'completed';
+    new_game.winner = message.userId;
     await new_game.save();
 }

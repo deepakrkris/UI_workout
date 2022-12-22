@@ -1,19 +1,19 @@
 export interface GameState {
     user1 : string,
     user2 : string,
+    status: string,
     id? : string,
     user1_coin? : string,
     user2_coin? : string,
     coin_data? : string[],
     connections? : string[],
-    status: string,
 };
 
 export interface ClientState {
     client : WebSocket,
     coin? : string,
-    user1? : string,
-    user2? : string,
+    userId? : string,
+    peerUserId? : string,
     gameId? : string,
     gridListener? : (e: any) => void,
 };
@@ -35,6 +35,7 @@ export interface SessionMessage {
 
 export interface GameMessage {
     gameId : string,
+    userId: string,
     type? : string,
     coin : string,
     position : number,

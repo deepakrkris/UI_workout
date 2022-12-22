@@ -18,6 +18,7 @@ export function handleGridAction(session : ClientState, board_address) {
         'coin': session.coin,
         'position': board_address,
         'gameId': session.gameId,
+        'userId': session.userId,
     };
     session.client.send(JSON.stringify(data));
     message_window.innerHTML = "Wait! Other player's turn now";
@@ -39,8 +40,8 @@ function setupGridListener(session : ClientState) {
 export function handleConnectionMessage(messg : ConnectionMessage, session : ClientState) {
     const data : SessionMessage = {
         'type': 'session_begin',
-        'user1': session.user1,
-        'user2': session.user2,
+        'user1': session.userId,
+        'user2': session.peerUserId,
         'connectionid': messg.connectionid,
     };
     session.client.send(JSON.stringify(data));

@@ -24,8 +24,8 @@ export function setup (user1: string, user2: string) {
 
         ClientConnectionHandler.session = {
             client: ClientConnectionHandler.websocket,
-            user1,
-            user2,
+            userId: user1,
+            peerUserId: user2,
         };
 
         ClientConnectionHandler.websocket.onmessage = (event : MessageEvent) => {
