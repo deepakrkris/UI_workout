@@ -4,6 +4,12 @@ export interface GameState {
     user2? : string,
     status: string,
     board : string[][],
+    user1_connection? : string,
+    user2_connection? : string,
+}
+
+export interface ExtendedWebSocket extends WebSocket {
+    connectionid : string,
 }
 
 export interface ClientState {
@@ -18,18 +24,29 @@ export interface UserActionMessage {
     col? : number,
     side : string,
     coin : string,
+    userId : string,
 }
 
 export interface GameSessionMessage {
+    type : 'session',
     userId : string,
     gameCode : string,
     coin? : string,
 }
 
+export interface NotificationMessage {
+    type : string,
+    message : string,
+}
+
 export function isGameSessionMessage(obj: any): obj is GameSessionMessage {
-    return 'userId' in obj && 'gameCode' in obj;
+    return 'type' in obj && obj.type == 'session' && 'userId' in obj && 'gameCode' in obj
 }
 
 export function isUserActionMessage(obj: any): obj is UserActionMessage {
-    return 'row' in obj && 'coin' in obj;
+    return 'row' in obj && 'coin' in obj
+}
+
+export function isNotificationMessage(obj: any): obj is NotificationMessage {
+    return 'type' in obj && 'message' in obj
 }
