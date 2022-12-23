@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica", sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    font-family: Montserrat;
+    background: linear-gradient(#3265c2, #3265c2) no-repeat center fixed;
+}
+
+.subscribe-container {
+    max-width: 800px;
+    margin: 60px auto;
+    background-color: rgba(130, 184, 219, 0.5);
+    border: 5px solid rgb(98, 143, 228);
+}
