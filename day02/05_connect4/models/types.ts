@@ -8,5 +8,6 @@ export interface GameState {
 
 export interface UserActionMessage {
     gameCode : string,
-    position : number,
+    row : number,
+    col? : number,
 }

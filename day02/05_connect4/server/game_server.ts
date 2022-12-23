@@ -23,6 +23,14 @@ function generateBoard() {
     return board
 }
 
+function lastAvailableColumn(row : string[]) {
+    for (let i=0; i<7; ++i) {
+        if (row[i] == '')
+           return i
+    }
+    return -1
+}
+
 export function connection_listener(ws: WebSocket, req: http.IncomingMessage) {
     const connectionid = req.headers['sec-websocket-key']
 
@@ -30,8 +38,6 @@ export function connection_listener(ws: WebSocket, req: http.IncomingMessage) {
 
     ws.addEventListener('message', (event: MessageEvent<any>) => {
         const message : UserActionMessage = JSON.parse(event.data)
- 
-        console.log('user action message', message.gameCode, message.position)
 
         if (!GameServer.games.has(message.gameCode)) {
             const game : GameState = {
@@ -42,13 +48,19 @@ export function connection_listener(ws: WebSocket, req: http.IncomingMessage) {
             GameServer.games.set(game.gameCode, game);
         }
 
-        const game : GameState = GameServer.games.get(message.gameCode);
-        game.board[message.position][0] = 'R'
+        const game : GameState = GameServer.games.get(message.gameCode)
 
-        console.log( game.board)
-
-        GameServer.connections.forEach((client) => {
-            client.send(JSON.stringify(message))
-        })
+        const column_available = lastAvailableColumn(game.board[message.row])
+        if (column_available > -1) {
+            game.board[message.row][column_available] = 'R'
+            const notification : UserActionMessage = {
+                gameCode: message.gameCode,
+                row: message.row,
+                col: column_available,
+            }
+            GameServer.connections.forEach((client) => {
+                client.send(JSON.stringify(notification))
+            })
+        }
     })
 }

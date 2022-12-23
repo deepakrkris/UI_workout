@@ -24,19 +24,20 @@ $(".click_position").each((_, click_position) => {
     click_position.addEventListener('click', (ev : MouseEvent) => {
         webSocket.send(JSON.stringify({
             'type': 'user_action', 
-            'position': row_clicked
+            'row': row_clicked
         }))
     })
 })
 
 webSocket.onmessage = (event : MessageEvent) => {
     const data : UserActionMessage = JSON.parse(event.data)
-    const row_clicked = data.position
+    const row_clicked = data.row
+    const col_available = data.col
 
     $('div[id=empty_position]').each((_, empty_position) => {
         const row = parseInt(empty_position.attributes.getNamedItem("row").value)
         const col = parseInt(empty_position.attributes.getNamedItem("col").value)
-        if ( row === row_clicked && col === 0 ) {
+        if ( row === row_clicked && col === col_available ) {
             empty_position.setAttribute('class', 'RED_COIN');
         }
     })
