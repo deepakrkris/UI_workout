@@ -9,6 +9,7 @@ export class GameServer {
 }
 
 GameServer.connections = new Map()
+GameServer.games = new Map<string, GameState>
 
 function generateBoard() {
     const board : string[][] = []
