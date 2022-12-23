@@ -19,3 +19,24 @@ body {
     background-color: rgba(130, 184, 219, 0.5);
     border: 5px solid rgb(98, 143, 228);
 }
+
+.board__container {
+    height: 60vh;
+    width: 35%;
+    vertical-align: top;
+    background-color: rgba(130, 184, 219, 0.5);
+    border: 5px solid rgba(17, 228, 10, 0.5);
+    margin: 0 auto;
+    box-shadow: 5px 5px 5px #0e1c36;
+    border-radius: 5%;
+    border: 5px solid #0e1c36;
+}
+
+.board__row {
+    width: 100%;
+    display: inline-block;
+    font-size: 0px;
+    text-align: center;
+    border: 0px;
+    vertical-align: top;
+}
