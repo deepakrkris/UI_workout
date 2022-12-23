@@ -36,11 +36,13 @@ join_btn.addEventListener('click', function(event: MouseEvent) {
 
 $(".click_position").each((_, click_position) => {
     const row_clicked : number = parseInt(click_position.attributes.getNamedItem('row').value)
+    const side : string = click_position.attributes.getNamedItem('side').value
     click_position.addEventListener('click', (ev : MouseEvent) => {
         const message : UserActionMessage = {
             row: row_clicked,
             coin: client_state.coin,
             gameCode: client_state.gameCode,
+            side,
         }
         webSocket.send(JSON.stringify(message))
     })
@@ -54,7 +56,7 @@ function handleUserActionNotification(data : UserActionMessage) {
         const row = parseInt(empty_position.attributes.getNamedItem("row").value)
         const col = parseInt(empty_position.attributes.getNamedItem("col").value)
         if ( row === row_clicked && col === col_available ) {
-            empty_position.setAttribute('class', client_state.coin);
+            empty_position.setAttribute('class', data.coin);
         }
     })
 }

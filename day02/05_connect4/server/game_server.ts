@@ -1,6 +1,8 @@
-import { GameState, UserActionMessage, GameSessionMessage, isGameSessionMessage, isUserActionMessage } from "../models/types.js"
 import { WebSocketServer } from 'ws'
 import * as http from 'http'
+
+import { GameState, UserActionMessage, GameSessionMessage, isGameSessionMessage, isUserActionMessage } from "../models/types.js"
+import { lastAvailableColumn , generateBoard } from './util.js'
 
 const valid_gamecodes = new Set(['grumpy', 'sleepy', 'sneezy', 'happy', 'dopey'])
 const user1_coin = 'RED_COIN'
@@ -31,14 +33,15 @@ export class GameServer {
     }
 
     static handleUserAction(ws: WebSocket, game : GameState, message : UserActionMessage) {
-        const column_available = lastAvailableColumn(game.board[message.row])
+        const column_available = lastAvailableColumn(game.board[message.row], message.side)
         if (column_available > -1) {
-            game.board[message.row][column_available] = 'R'
+            game.board[message.row][column_available] = message.coin
             const notification : UserActionMessage = {
                 gameCode: message.gameCode,
                 row: message.row,
                 col: column_available,
                 coin: message.coin,
+                side: message.side,
             }
             GameServer.connections.forEach((client) => {
                 client.send(JSON.stringify(notification))
@@ -49,26 +52,6 @@ export class GameServer {
 
 GameServer.connections = new Map()
 GameServer.games = new Map<string, GameState>
-
-function generateBoard() {
-    const board : string[][] = []
-    for (let row=0; row<7; ++row) {
-        const row = []
-        for (let col=0; col<7; ++col) {
-            row.push('')
-        }
-        board.push(row)
-    }
-    return board
-}
-
-function lastAvailableColumn(row : string[]) {
-    for (let i=0; i<7; ++i) {
-        if (row[i] == '')
-           return i
-    }
-    return -1
-}
 
 export function connection_listener(ws: WebSocket, req: http.IncomingMessage) {
     const connectionid = req.headers['sec-websocket-key']

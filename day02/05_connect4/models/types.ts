@@ -16,6 +16,7 @@ export interface UserActionMessage {
     gameCode : string,
     row : number,
     col? : number,
+    side : string,
     coin : string,
 }
 
