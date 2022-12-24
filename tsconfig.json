@@ -3,7 +3,7 @@
       "esModuleInterop": true,
       "target": "es2015",
       "module": "es2015",
-      "outDir": "dist",
+      "outDir": "public",
       "moduleResolution": "node",
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
