@@ -1,9 +1,21 @@
-import { UserActionMessage, GameSessionMessage, NotificationMessage, isGameSessionMessage, isUserActionMessage, isNotificationMessage, ClientState } from '../models/types.js'
-import { handleGameNotification, handleGameSessionNotification, handleUserActionNotification } from './ui_handlers.js'
+import { 
+    UserActionMessage,
+    GameSessionMessage,
+    NotificationMessage,
+    isGameSessionMessage,
+    isUserActionMessage,
+    isNotificationMessage,
+    ClientState } from '../models/types.js'
+import { 
+    handleGameNotification,
+    handleGameSessionNotification,
+    handleUserActionNotification } from './ui_handlers.js'
 
 export class ClientConnection {
     static client_state : ClientState
     static websocket : WebSocket
+    static leftGridListener : (e: any) => void
+    static rightGridListener : (e: any) => void
 
     static init() {
         this.client_state = {}

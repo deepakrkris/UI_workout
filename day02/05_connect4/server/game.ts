@@ -1,5 +1,8 @@
 import { lastAvailableColumn } from './util.js'
-import { ExtendedWebSocket, GameSessionMessage, GameState, UserActionMessage } from "../models/types.js"
+import { ExtendedWebSocket,
+    GameSessionMessage,
+    GameState,
+    UserActionMessage } from "../models/types.js"
 import { sameRowMatch, sameColumnMatch, diagonalMatch } from './board_handlers.js'
 import { EventEmitter } from 'events'
 import { MessageHandler } from './message_handler.js'

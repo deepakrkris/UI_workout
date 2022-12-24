@@ -20,6 +20,18 @@ body {
     border: 5px solid rgb(98, 143, 228);
 }
 
+.description {
+    position: relative;
+    margin: 10px;
+    width: 35%;
+    display: flex;
+    flex-wrap: wrap;
+    font-family: "Permanent Marker";
+    font-size: 20px;
+    color:black;
+    padding: 10px;
+}
+
 .bodyTable{
     border: 0px;
     width: 45%;

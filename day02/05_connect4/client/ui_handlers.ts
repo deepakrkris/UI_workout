@@ -3,6 +3,7 @@ import { UserActionMessage, GameSessionMessage, NotificationMessage } from '../m
 import { ClientConnection } from './client_state.js'
 
 const join_btn = document.getElementById('join_btn');
+const message_window = document.getElementById('description');
 
 join_btn.addEventListener('click', function(event: MouseEvent) {
     const userId_e = document.getElementById('userId') as HTMLInputElement | null
@@ -31,28 +32,24 @@ function handleUserClickAction(target : HTMLElement) {
         side,
         userId: client_state.userId,
     }
-  
-    console.log('sending message')
     ClientConnection.send(message)
 }
 
 export function leftGridListener({ target }) {
-    console.log(" left clicked ")
-
     if (target.className == 'click_position') {
         handleUserClickAction(target)
         $('#left-side-container').off('click')
         $('#right-side-container').off('click')
+        message_window.innerHTML = "Wait! Other player's turn now";
     }
 }
 
 export function rightGridListener({ target }) {
-    console.log(" right clicked ")
-
     if (target.className == 'click_position') {
         handleUserClickAction(target)
         $('#left-side-container').off('click')
         $('#right-side-container').off('click')
+        message_window.innerHTML = "Wait! Other player's turn now";
     }
 }
 
@@ -77,16 +74,12 @@ export function handleGameSessionNotification(data : GameSessionMessage) {
 
 export function handleGameNotification(data : NotificationMessage) {
     if (data.type == 'take_turn') {
-        $('#left-side-container').on('click', leftGridListener)
-        $('#right-side-container').on('click', rightGridListener)
+        $('#left-side-container').off('click')
+        $('#right-side-container').off('click')
+        $('#left-side-container').on('click', ClientConnection.leftGridListener)
+        $('#right-side-container').on('click', ClientConnection.rightGridListener)
+        message_window.innerHTML = data.message
+    } else if (data.type == 'result') {
+        message_window.innerHTML = data.message
     }
 }
-
-/*
-$(".click_position").each((_, click_position) => {
-    const row_clicked : number = parseInt(click_position.attributes.getNamedItem('row').value)
-    const side : string = click_position.attributes.getNamedItem('side').value
-    click_position.addEventListener('click', (ev : MouseEvent) => {
-
-    })
-})*/
