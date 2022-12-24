@@ -28,7 +28,6 @@ export class GameServer {
         const game = this.getGameSession(message)
         const notification : GameSessionMessage = game.initGame(ws, message);
         ws.send(JSON.stringify(notification))
-        console.log(game)
     }
 
     static handleUserAction(ws: WebSocket, message : UserActionMessage) {

@@ -1,10 +1,8 @@
 import { NotificationMessage , UserActionMessage } from "../models/types.js"
 import { Game } from './game.js'
 
-
 const winning_message = 'You Won !!!'
 const next_try_message = 'The other player won :) , Ask for a re-match !! '
-
 
 export class MessageHandler {
 
@@ -13,9 +11,11 @@ export class MessageHandler {
         let runner;
 
         if (game.isUser1Turn) {
+            console.log('user 1 is winner')
             winner = game.getUser1Connection(connections)
             runner = game.getUser2Connection(connections)
         } else {
+            console.log('user 2 is winner')
             winner = game.getUser1Connection(connections)
             runner = game.getUser2Connection(connections)
         }
