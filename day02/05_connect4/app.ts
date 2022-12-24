@@ -18,7 +18,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html")
-});
+})
+
+app.get("/genGameCode", (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ code : GameServer.generateGameCode() }, null, 3));
+})
 
 GameServer.socketServer = new WebSocketServer({ server })
 

@@ -35,6 +35,10 @@ export class MessageHandler {
         }))
     }
 
+    static sendMessage(ws : ExtendedWebSocket, message : GameSessionMessage | NotificationMessage ) {
+        ws.send(JSON.stringify(message))
+    }
+
     static sendInitMessage(ws : ExtendedWebSocket, gameCode : string, userId : string, coin : string) {
         const notification : GameSessionMessage = {
             gameCode,

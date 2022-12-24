@@ -8,7 +8,6 @@ import { EventEmitter } from 'events'
 import { MessageHandler } from './message_handler.js'
 import { GameServer } from './game_server.js'
 
-const valid_gamecodes = new Set(['grumpy', 'sleepy', 'sneezy', 'happy', 'dopey'])
 const user1_coin = 'RED_COIN'
 const user2_coin = 'BLUE_COIN'
 
