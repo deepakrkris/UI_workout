@@ -1,6 +1,6 @@
 # Connect4 - SideStacker Game
 
-![cover](https://github.com/deepakrkris/UI_workout/blob/main/connect4_page.jpg?raw=true)
+![cover](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/connect4_page.png?raw=true)
 
 SideStacker version of Connect-4
 
