@@ -87,16 +87,23 @@ export function handleGameSessionNotification(data : GameSessionMessage) {
     client_state.coin = data.coin
     join_btn.setAttribute('disabled', 'true');
     $('.bodyTable').show();
+    $('#left-side-container').off('click')
+    $('#right-side-container').off('click')
 }
 
 export function handleGameNotification(data : NotificationMessage) {
-    if (data.type == 'take_turn') {
+    if (data.type === 'take_turn') {
         $('#left-side-container').off('click')
         $('#right-side-container').off('click')
         $('#left-side-container').on('click', ClientConnection.leftGridListener)
         $('#right-side-container').on('click', ClientConnection.rightGridListener)
         message_window.innerHTML = data.message
-    } else if (data.type == 'result') {
+    } else if (data.type === 'result') {
+        message_window.innerHTML = data.message
+    } else if (data.type === 'peer_disconnected') {
+        console.log('peer disconnect')
+        $('#left-side-container').off('click')
+        $('#right-side-container').off('click')
         message_window.innerHTML = data.message
     }
 }

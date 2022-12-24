@@ -35,7 +35,13 @@ export class MessageHandler {
         }))
     }
 
-    static sendInitMessage(ws : ExtendedWebSocket, notification : GameSessionMessage) {
+    static sendInitMessage(ws : ExtendedWebSocket, gameCode : string, userId : string, coin : string) {
+        const notification : GameSessionMessage = {
+            gameCode,
+            userId,
+            type : 'session',
+            coin,
+        }
         ws.send(JSON.stringify(notification))
     }
 
@@ -51,6 +57,15 @@ export class MessageHandler {
             'type': 'take_turn',
             message: 'Your turn now !'
         }
-        connections.get(next_user_connectionId).send(JSON.stringify(start_your_turn));
+        connections.get(next_user_connectionId).send(JSON.stringify(start_your_turn))
+    }
+
+    static notifyDisconnectedUser(peer_connection_id : string) {
+        const connections: Map<string, WebSocket> = GameServer.connections
+        const start_your_turn : NotificationMessage = {
+            'type': 'peer_disconnected',
+            message: 'Peer disconnected, Wait until they rejoin!'
+        }
+        connections.get(peer_connection_id).send(JSON.stringify(start_your_turn))
     }
 }

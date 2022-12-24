@@ -13,6 +13,7 @@ export class GameServer {
     static games: Map<string, Game>
     static socketServer: WebSocketServer 
     static connections: Map<string, WebSocket>
+    static connection_to_game: Map<string, string>
 
     static createNewGame(message : GameSessionMessage | UserActionMessage) {
         const game = new Game({
@@ -58,7 +59,15 @@ export function connection_listener(ws: ExtendedWebSocket, req: http.IncomingMes
     ws.connectionid = connectionid
     GameServer.connections.set(connectionid, ws)
     ws.addEventListener('message', GameServer.getMessageListener(ws))
+    ws.addEventListener('close', (ev: CloseEvent) => {
+        const gameCode : string = GameServer.connection_to_game.get(ws.connectionid)
+        const game = GameServer.games.get(gameCode)
+        game.handleDisconnectedUser(ws.connectionid)
+        GameServer.connections.delete(connectionid);
+        console.log('Client has disconnected!');
+    });
 }
 
 GameServer.connections = new Map<string, WebSocket>()
 GameServer.games = new Map<string, Game>
+GameServer.connection_to_game = new Map<string, string>

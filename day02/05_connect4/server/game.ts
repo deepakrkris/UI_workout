@@ -6,6 +6,7 @@ import { ExtendedWebSocket,
 import { sameRowMatch, sameColumnMatch, diagonalMatch } from './board_handlers.js'
 import { EventEmitter } from 'events'
 import { MessageHandler } from './message_handler.js'
+import { GameServer } from './game_server.js'
 
 const valid_gamecodes = new Set(['grumpy', 'sleepy', 'sneezy', 'happy', 'dopey'])
 const user1_coin = 'RED_COIN'
@@ -26,12 +27,16 @@ export class Game extends EventEmitter {
         this.on('game_init', MessageHandler.sendInitMessage)
         this.on('next_user_turn', MessageHandler.handleNextUserTurn)
         this.on('end_of_game', MessageHandler.endOfGameMessages)
+        this.on('user_disconnected', MessageHandler.notifyDisconnectedUser)
     }
 
     initUser1(userId : string, connectionId : string) {
         const game_state = this.game_state
         game_state.user1 = userId
         game_state.user1_connection = connectionId
+        if (game_state.status === 'user1_disconnected') {
+            this.emit('next_user_turn', this, game_state.user1_connection)
+        }
         game_state.status = 'waiting_for_user2'
     }
 
@@ -39,6 +44,9 @@ export class Game extends EventEmitter {
         const game_state = this.game_state
         game_state.user2 = userId
         game_state.user2_connection = connectionId
+        if (game_state.status === 'user2_disconnected') {
+            this.emit('next_user_turn', this, game_state.user2_connection)
+        }
         game_state.status = 'start'
     }
 
@@ -51,22 +59,32 @@ export class Game extends EventEmitter {
     }
 
     initGame(ws : ExtendedWebSocket, message : GameSessionMessage) {
-        const notification : GameSessionMessage = {
-            gameCode: message.gameCode,
-            userId: message.userId,
-            type : 'session',
-        }
-
         const game_state = this.game_state
 
         if (!game_state.user1) {
             this.initUser1(message.userId, ws.connectionid)
-            notification.coin = user1_coin
+            GameServer.connection_to_game.set(ws.connectionid, game_state.gameCode)
+            this.emit('game_init', ws, message.gameCode, message.userId, user1_coin)
         } else if (!game_state.user2) {
             this.initUser2(message.userId, ws.connectionid)
-            notification.coin = user2_coin
+            GameServer.connection_to_game.set(ws.connectionid, game_state.gameCode)
+            this.emit('game_init', ws, message.gameCode, message.userId, user2_coin)
+            this.emit('next_user_turn', this, game_state.user1_connection)
         }
-        this.emit('game_init', ws, notification)
+    }
+
+    handleDisconnectedUser(connectionId : string) {
+        if (connectionId == this.game_state.user1_connection) {
+            this.game_state.user1 = null
+            this.game_state.user1_connection = null
+            this.game_state.status = 'user1_disconnected'
+            this.emit('user_disconnected', this.game_state.user2_connection)
+        } if (connectionId == this.game_state.user2_connection) {
+            this.game_state.user2 = null
+            this.game_state.user2_connection = null
+            this.game_state.status = 'user2_disconnected'
+            this.emit('user_disconnected', this.game_state.user1_connection)
+        }
     }
 
     updateGameBoard(message: UserActionMessage) {
