@@ -9,6 +9,7 @@
       "emitDecoratorMetadata": true,
   },
   "exclude": [
-      "Archive"
+      "day01",
+      "day02"
   ],
 }
