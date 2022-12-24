@@ -7,7 +7,8 @@ import { GameServer, connection_listener } from './server/game_server.js'
 
 const __dirname = path.resolve()
 const app = express()
-const server = app.listen(3000, () => {
+const port = process.env.PORT || 3000
+const server = app.listen(port, () => {
     console.log("Application started and Listening on port 3000")
 });
 
