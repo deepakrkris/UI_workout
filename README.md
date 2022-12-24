@@ -1,6 +1,6 @@
 # Connect4 - SideStacker Game
 
-![cover](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/connect4_page.png?raw=true)
+![cover](https://github.com/deepakrkris/UI_workout/blob/main/connect4_page.png?raw=true)
 
 SideStacker version of Connect-4
 
@@ -41,12 +41,12 @@ $ npm start
 
 Step 4: Generate game code
 
-![generate game code](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/Generate_game_code.png?raw=true)
+![generate game code](https://github.com/deepakrkris/UI_workout/blob/main/Generate_game_code.png?raw=true)
 
 
 Step 5: Load game page in browser and enter user id and game code
 
-![load game page](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/user_details.png?raw=true)
+![load game page](https://github.com/deepakrkris/UI_workout/blob/main/user_details.png?raw=true)
 
 
 ## Design
