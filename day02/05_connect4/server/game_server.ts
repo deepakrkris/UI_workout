@@ -1,9 +1,10 @@
 import { WebSocketServer } from 'ws'
 import * as http from 'http'
 
-import { UserActionMessage, GameSessionMessage, NotificationMessage, ExtendedWebSocket, isGameSessionMessage, isUserActionMessage } from "../models/types.js"
+import { UserActionMessage, GameSessionMessage, ExtendedWebSocket, isGameSessionMessage, isUserActionMessage } from "../models/types.js"
 import { Game } from './game.js'
 import { generateBoard } from './util.js'
+import { MessageHandler } from './message_handler.js'
 
 export class GameServer {
     static games: Map<string, Game>
@@ -31,40 +32,35 @@ export class GameServer {
     }
 
     static handleUserAction(ws: WebSocket, message : UserActionMessage) {
-        console.log("handle user action for ", message.userId, message.row, message.side)
+        console.log("handle user action for ", message)
+
         const game = this.getGameSession(message)
 
-        const userNotification = game.updateGameBoard(message);
-        if (userNotification) {
-            GameServer.connections.forEach((client) => {
-                client.send(JSON.stringify(userNotification))
-            })
-        }
+        const userNotification : UserActionMessage = game.updateGameBoard(message)
 
-        const start_your_turn : NotificationMessage = {
-            'type': 'take_turn',
-            message: 'Your turn now !'
+        if (userNotification) {
+            MessageHandler.sendBoardUpdateMessages(this.connections, game, userNotification)
         }
-        const next_user_connectionId : string = game.handleNextUserTurn(ws, message.userId)
-        GameServer.connections.get(next_user_connectionId).send(JSON.stringify(start_your_turn));
     }
 }
 
-GameServer.connections = new Map()
-GameServer.games = new Map<string, Game>
-
-export function connection_listener(ws: ExtendedWebSocket, req: http.IncomingMessage) {
-    const connectionid = req.headers['sec-websocket-key']
-    ws.connectionid = connectionid
-
-    GameServer.connections.set(connectionid, ws)
-
-    ws.addEventListener('message', (event: MessageEvent<any>) => {
+function getMessageListener(ws: ExtendedWebSocket) {
+    return (event: MessageEvent<any>) => {
         const message : UserActionMessage | GameSessionMessage = JSON.parse(event.data)
         if (isGameSessionMessage(message)) {
             GameServer.handleGameSession(ws, message)
         } else if (isUserActionMessage(message)) {
             GameServer.handleUserAction(ws, message)
         }
-    })
+    }
 }
+
+export function connection_listener(ws: ExtendedWebSocket, req: http.IncomingMessage) {
+    const connectionid = req.headers['sec-websocket-key']
+    ws.connectionid = connectionid
+    GameServer.connections.set(connectionid, ws)
+    ws.addEventListener('message', getMessageListener(ws))
+}
+
+GameServer.connections = new Map()
+GameServer.games = new Map<string, Game>
