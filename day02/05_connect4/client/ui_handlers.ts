@@ -4,6 +4,7 @@ import { ClientConnection } from './client_state.js'
 
 const join_btn = document.getElementById('join_btn');
 const message_window = document.getElementById('description');
+const mandatury_fields = ['userId', 'gameCode'];
 
 join_btn.addEventListener('click', function(event: MouseEvent) {
     const userId_e = document.getElementById('userId') as HTMLInputElement | null
@@ -19,6 +20,21 @@ join_btn.addEventListener('click', function(event: MouseEvent) {
     }
     ClientConnection.send(join_game)
 })
+join_btn.setAttribute('disabled', 'true');
+
+mandatury_fields.forEach((field_name) => {
+    const field = document.getElementById(field_name);
+    field.addEventListener('keyup', function(event) {
+        const all_fields_entered = mandatury_fields.every((f) => {
+            const element = document.getElementById(f) as HTMLInputElement | null;
+            const flag = element.value != '' && element.value.length >= parseInt(element.getAttribute('minlength'));
+            return flag;
+        });
+        if (all_fields_entered) {
+            join_btn.removeAttribute('disabled');
+        }
+    });
+});
 
 function handleUserClickAction(target : HTMLElement) {
     const row_clicked : number = parseInt(target.attributes.getNamedItem('row').value)
@@ -69,6 +85,7 @@ export function handleUserActionNotification(data : UserActionMessage) {
 export function handleGameSessionNotification(data : GameSessionMessage) {
     const client_state = ClientConnection.client_state
     client_state.coin = data.coin
+    join_btn.setAttribute('disabled', 'true');
     $('.bodyTable').show();
 }
 
