@@ -54,13 +54,13 @@ export class GameServer {
     static establishUserGameSession(ws: ExtendedWebSocket, message : GameSessionMessage) {
         const game = this.getGameSession(message, ws)
         if (game)
-            game.initGame(ws, message)
+            game.initGame(ws, message).catch(console.log)
     }
 
     static executeUserTurns(ws: ExtendedWebSocket, message : UserActionMessage) {
         const game = this.getGameSession(message, ws)
         if (game)
-            game.executeUserTurns(message)
+            game.executeUserTurns(message).catch(console.log)
     }
 
     static getMessageListener(ws: ExtendedWebSocket) {

@@ -7,6 +7,7 @@ import { sameRowMatch, sameColumnMatch, diagonalMatch } from './board_handlers.j
 import { EventEmitter } from 'events'
 import { MessageHandler } from './message_handler.js'
 import { GameServer } from './game_server.js'
+import { createOrGetGameSession, saveGameMove, saveGameResult } from '../models/repository.js';
 
 const user1_coin = 'RED_COIN'
 const user2_coin = 'BLUE_COIN'
@@ -57,7 +58,7 @@ export class Game extends EventEmitter {
         return connections.get(this.game_state.user2_connection)
     }
 
-    initGame(ws : ExtendedWebSocket, message : GameSessionMessage) {
+    async initGame(ws : ExtendedWebSocket, message : GameSessionMessage) {
         const game_state = this.game_state
 
         if (!game_state.user1) {
@@ -69,6 +70,7 @@ export class Game extends EventEmitter {
             GameServer.connection_to_game.set(ws.connectionid, game_state.gameCode)
             this.emit('game_init', ws, message.gameCode, message.userId, user2_coin)
             this.emit('next_user_turn', this, game_state.user1_connection)
+            await createOrGetGameSession(game_state)
         }
     }
 
@@ -110,12 +112,19 @@ export class Game extends EventEmitter {
         }
     }
 
-    executeUserTurns(message : UserActionMessage) {
+    async executeUserTurns(message : UserActionMessage) {
         this.updateGameBoard(message)
+        
+        await saveGameMove(this.game_state)
 
         // console.log("handle user action for ", message)
         if (this.isWinningMove()) {
+            this.game_state.winner = message.userId
+
             this.emit('end_of_game', this)
+
+            await saveGameResult(this.game_state)
+
         } else {
             let next_user_connectionId = null
             if (this.isUser1Turn) {

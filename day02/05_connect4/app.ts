@@ -2,6 +2,7 @@ import express from "express"
 import bodyParser from "body-parser"
 import path from 'path'
 import { WebSocketServer } from 'ws'
+import { init as db_init } from './models/db_connection.js';
 import { GameServer, connection_listener } from './server/game_server.js'
 
 const __dirname = path.resolve()
@@ -25,6 +26,7 @@ app.get("/genGameCode", (req, res) => {
     res.end(JSON.stringify({ code : GameServer.generateGameCode() }, null, 3));
 })
 
-GameServer.socketServer = new WebSocketServer({ server })
+db_init();
 
+GameServer.socketServer = new WebSocketServer({ server })
 GameServer.socketServer.on('connection', connection_listener);

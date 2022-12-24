@@ -6,6 +6,7 @@ export interface GameState {
     board : string[][],
     user1_connection? : string,
     user2_connection? : string,
+    winner? : string,
 }
 
 export interface ExtendedWebSocket extends WebSocket {
