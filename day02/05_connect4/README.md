@@ -39,6 +39,16 @@ Step 3: Start the server
 $ npm start
 ```
 
+Step 4: Generate game code
+
+![generate game code](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/Generate_game_code.png?raw=true)
+
+
+Step 5: Load game page in browser and enter user id and game code
+
+![load game page](https://github.com/deepakrkris/UI_workout/blob/main/day02/05_connect4/user_details.png?raw=true)
+
+
 ## Design
 
 
