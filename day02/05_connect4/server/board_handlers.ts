@@ -27,40 +27,49 @@ export function sameRowMatch(game : GameState,  row : number, col : number, coin
 
         if (continuous_match >= 4) return true
     }
-
     return continuous_match >= 4
 }
 
-export function diagonalMatch(game : GameState,  row : number, col : number, coin: string) {
-    const match_candidates : string[][] = game.board
-
-    function match(change_vector: number[][]) {
+export function get_matchfn_for_change_vectors(board : string[][], row : number, col : number, coin: string) {
+    return function match(change_vector: number[][]) {
         let continuous_match = 0
         for (let v of change_vector) {
             let row_index = row
             let col_index = col
             let row_incr = v[0]
             let col_incr = v[1]
+    
+            // move from current placement cell 
             row_index += row_incr
             col_index += col_incr
+
             while (row_index >= 0 && col_index >= 0 && row_index < 7 && col_index < 7) {
-                if (match_candidates[row_index][col_index] === coin)
+                if (board[row_index][col_index] === coin)
                     continuous_match += 1
                 else 
                     continuous_match = 0
-                if (continuous_match >= 3) return true;
+                // if 3 match found in down and up directions of one of diagonals / or \ ,
+                // then with current placement 3 + 1 gives 4 matches
+                if (continuous_match >= 3) return true
                 row_index += row_incr
                 col_index += col_incr
             }
         }
+
         return continuous_match >= 3
     }
+}
+
+export function diagonalMatch(game : GameState,  row : number, col : number, coin: string) {
+    const match_candidates : string[][] = game.board
+
+    const matchFn = get_matchfn_for_change_vectors(match_candidates, row, col, coin)
 
     const change_vector : number[][] = [[1, -1], [-1, 1]]
     const reverse_change_vector : number[][] = [[1 , 1], [ -1, -1 ]]
 
-    if (match(change_vector)) return true
-    if (match(reverse_change_vector)) return true
+    if (matchFn(change_vector)) return true
+    if (matchFn(reverse_change_vector)) return true
 
     return false
 }

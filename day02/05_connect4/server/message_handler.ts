@@ -1,12 +1,14 @@
-import { NotificationMessage , UserActionMessage } from "../models/types.js"
+import { ExtendedWebSocket, GameSessionMessage, NotificationMessage , UserActionMessage } from "../models/types.js"
 import { Game } from './game.js'
+import { GameServer } from "./game_server.js"
 
 const winning_message = 'You Won !!!'
 const next_try_message = 'The other player won :) , Ask for a re-match !! '
 
 export class MessageHandler {
 
-    static endOfGameMessages(connections: Map<string, WebSocket>, game : Game) {
+    static endOfGameMessages(game : Game) {
+        const connections: Map<string, WebSocket> = GameServer.connections
         let winner;
         let runner;
 
@@ -30,19 +32,22 @@ export class MessageHandler {
         }))
     }
 
-    static sendBoardUpdateMessages(connections: Map<string, WebSocket>, game : Game, userNotification : UserActionMessage) {
+    static sendInitMessage(ws : ExtendedWebSocket, notification : GameSessionMessage) {
+        ws.send(JSON.stringify(notification))
+    }
+
+    static sendBoardUpdateMessages(game : Game, userNotification : UserActionMessage) {
+        const connections: Map<string, WebSocket> = GameServer.connections
         game.getUser1Connection(connections).send(JSON.stringify(userNotification))
         game.getUser2Connection(connections).send(JSON.stringify(userNotification))
+    }
 
-        if (game.isWinningMove()) {
-            return this.endOfGameMessages(connections, game)
-        }
-
+    static handleNextUserTurn(game : Game, next_user_connectionId : string) {
+        const connections: Map<string, WebSocket> = GameServer.connections
         const start_your_turn : NotificationMessage = {
             'type': 'take_turn',
             message: 'Your turn now !'
         }
-        const next_user_connectionId : string = game.handleNextUserTurn()
         connections.get(next_user_connectionId).send(JSON.stringify(start_your_turn));
     }
 }

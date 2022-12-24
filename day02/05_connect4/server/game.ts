@@ -1,12 +1,14 @@
 import { lastAvailableColumn } from './util.js'
 import { ExtendedWebSocket, GameSessionMessage, GameState, UserActionMessage } from "../models/types.js"
 import { sameRowMatch, sameColumnMatch, diagonalMatch } from './board_handlers.js'
+import { EventEmitter } from 'events'
+import { MessageHandler } from './message_handler.js'
 
 const valid_gamecodes = new Set(['grumpy', 'sleepy', 'sneezy', 'happy', 'dopey'])
 const user1_coin = 'RED_COIN'
 const user2_coin = 'BLUE_COIN'
 
-export class Game {
+export class Game extends EventEmitter {
     game_state : GameState
     last_move_row : number
     last_move_col : number
@@ -15,7 +17,12 @@ export class Game {
     isUser2Turn : boolean
 
     constructor(game_state : GameState) {
+        super()
         this.game_state = game_state
+        this.on('updatedGameBoard', MessageHandler.sendBoardUpdateMessages)
+        this.on('game_init', MessageHandler.sendInitMessage)
+        this.on('next_user_turn', MessageHandler.handleNextUserTurn)
+        this.on('end_of_game', MessageHandler.endOfGameMessages)
     }
 
     initUser1(userId : string, connectionId : string) {
@@ -56,7 +63,7 @@ export class Game {
             this.initUser2(message.userId, ws.connectionid)
             notification.coin = user2_coin
         }
-        return notification
+        this.emit('game_init', ws, notification)
     }
 
     updateGameBoard(message: UserActionMessage) {
@@ -79,15 +86,24 @@ export class Game {
                 side: message.side,
                 userId: message.userId,
             }
-            return notification
+            this.emit('updatedGameBoard', this, notification)
         }
     }
 
-    handleNextUserTurn() {
-        if (this.isUser1Turn) {
-            return this.game_state.user2_connection
+    executeUserTurns(message : UserActionMessage) {
+        this.updateGameBoard(message)
+
+        // console.log("handle user action for ", message)
+        if (this.isWinningMove()) {
+            this.emit('end_of_game', this)
         } else {
-            return this.game_state.user1_connection
+            let next_user_connectionId = null
+            if (this.isUser1Turn) {
+                next_user_connectionId = this.game_state.user2_connection
+            } else {
+                next_user_connectionId = this.game_state.user1_connection
+            }
+            this.emit('next_user_turn', this, next_user_connectionId)
         }
     }
 
