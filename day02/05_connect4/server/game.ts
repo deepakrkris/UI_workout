@@ -79,12 +79,12 @@ export class Game extends EventEmitter {
             this.game_state.user1 = null
             this.game_state.user1_connection = null
             this.game_state.status = 'user1_disconnected'
-            this.emit('user_disconnected', this.game_state.user2_connection)
+            // this.emit('user_disconnected', this.game_state.user2_connection)
         } if (connectionId == this.game_state.user2_connection) {
             this.game_state.user2 = null
             this.game_state.user2_connection = null
             this.game_state.status = 'user2_disconnected'
-            this.emit('user_disconnected', this.game_state.user1_connection)
+            // this.emit('user_disconnected', this.game_state.user1_connection)
         }
     }
 
