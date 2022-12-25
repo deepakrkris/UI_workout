@@ -2,7 +2,7 @@
     "name": "05_connect4",
     "version": "1.0.0",
     "description": "",
-    "main": "public/app.js",
+    "main": "dist/app.js",
     "type": "module",
     "scripts": {
         "start": "node .",
