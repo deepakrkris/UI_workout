@@ -12,6 +12,13 @@ import { createOrGetGameSession, saveGameMove, saveGameResult } from '../models/
 const user1_coin = 'RED_COIN'
 const user2_coin = 'BLUE_COIN'
 
+/**
+ * 
+ * Class for a game instance
+ *     - holds state of game
+ *     - executes user turns
+ *     - emits game and user events
+ */
 export class Game extends EventEmitter {
     game_state : GameState
     last_move_row : number

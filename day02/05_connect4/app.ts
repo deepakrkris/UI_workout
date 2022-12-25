@@ -26,6 +26,7 @@ app.get("/genGameCode", (req, res) => {
     res.end(JSON.stringify({ code : GameServer.generateGameCode() }, null, 3));
 })
 
+// initialize database connections
 db_init();
 
 GameServer.socketServer = new WebSocketServer({ server })
