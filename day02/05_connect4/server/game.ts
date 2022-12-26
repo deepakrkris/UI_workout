@@ -7,7 +7,7 @@ import { sameRowMatch, sameColumnMatch, diagonalMatch } from './board_handlers.j
 import { EventEmitter } from 'events'
 import { MessageHandler } from './message_handler.js'
 import { GameServer } from './game_server.js'
-import { createOrGetGameSession, saveGameMove, saveGameResult } from '../models/repository.js';
+import { createOrGetGameSession, createOrGetUser, saveGameMove, saveGameResult } from '../models/repository.js';
 
 const user1_coin = 'RED_COIN'
 const user2_coin = 'BLUE_COIN'
@@ -71,10 +71,12 @@ export class Game extends EventEmitter {
         if (!game_state.user1) {
             this.initUser1(message.userId, ws.connectionid)
             GameServer.connection_to_game.set(ws.connectionid, game_state.gameCode)
+            await createOrGetUser(message.userId)
             this.emit('game_init', ws, message.gameCode, message.userId, user1_coin)
         } else if (!game_state.user2) {
             this.initUser2(message.userId, ws.connectionid)
             GameServer.connection_to_game.set(ws.connectionid, game_state.gameCode)
+            await createOrGetUser(message.userId)
             this.emit('game_init', ws, message.gameCode, message.userId, user2_coin)
             this.emit('next_user_turn', this, game_state.user1_connection)
             await createOrGetGameSession(game_state)
